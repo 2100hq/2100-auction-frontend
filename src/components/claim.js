@@ -53,7 +53,7 @@ export const ClaimCard = props=>{
   return <Flex flexDirection='column' alignItems='center'>
     <p> 
       One or more 2100 auctions you participated in have completed.
-      Please claim your tokens.
+      Please withdraw your tokens.
     </p>
     <BidsList bids={Object.values(groupedBids)}/>
   </Flex>
@@ -67,7 +67,7 @@ export const ClaimModal = (props={}) =>{
     onHide={onHide}>
     <Modal.Header closeButton>
       <Modal.Title>
-        <strong>Claim your 2100 tokens</strong>
+        <strong>Withdraw 2100 tokens</strong>
       </Modal.Title>
     </Modal.Header>
 
@@ -132,7 +132,7 @@ export const ClaimModalButton = wiring.connect((props) =>{
     {
       inactiveBids.length ? 
       <Button variant='warning' size='sm' onClick={handleShow}>
-        You have unclaimed tokens! Claim Now
+        You have Tokens! Withdraw Now
       </Button>
       : null
     }

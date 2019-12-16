@@ -39,7 +39,7 @@ export const BidButton = wiring.connect(({disabled,name,value,donate,bid,dispatc
   }
 
   return <BurnButton disabled={disabled} onClick={click}>
-    {donate ? <strong> Donate </strong> : <strong>Burn</strong>} 
+    {donate ? <strong> Donate Now </strong> : <strong>Send Now</strong>} 
   </BurnButton>
 })
 
@@ -65,6 +65,6 @@ export const ClaimAllButton = wiring.connect(({name,claimAll,auctionIds,amount='
       .finally(onClick)
   }
   return <Button onClick={click}>
-    Claim Tokens
+    Withdraw
   </Button>
 })

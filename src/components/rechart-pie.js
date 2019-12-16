@@ -13,8 +13,8 @@ export const AuctionChart = ({
   myAddress,
   newBid='0',
   dispatch,
-  width=250,
-  height=250
+  width=125,
+  height=125
 })=>{
 
   const bids = Object.values(get(auction,'bids',{}))
@@ -110,8 +110,8 @@ export const AuctionChart = ({
         legendType='line'
         nameKey='name' 
         fill="#8884d8" 
-        innerRadius={65}
-        outerRadius={100}
+        innerRadius={35}
+        outerRadius={50}
         paddingAngle={0}
       >
         {

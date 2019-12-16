@@ -88,26 +88,30 @@ export const Hr = styled.hr`
 
 export const BurnInput = styled.input`
   // border-radius: 0 50px 50px 0;
-  width:100px;
+  // border-radius: 50px 50px 50px 50px;
+  width:150px;
   height:35px;
-  background-color:#e5ff9f;
+  border-width:0px;
+  border-bottom-width:2px;
+  // background-color:#e5ff9f;
   disabled:${props=>props.disabled};
 `
 
 export const BurnButton = styled.button`
-  border-radius: 50px 0 0 50px;
+  border-radius: 50px 50px 50px 50px;
   height:35px;
-  width:100px;
+  width:150px;
   padding:0;
   disabled:${props=>props.disabled};
   // border-width:0;
 `
 
-export const UnitButton = styled.button`
-  border-radius: 0 50px 50px 0;
-  background-color:#e5ff9f
+export const UnitButton = styled.div`
+  // border-radius: 0 50px 50px 0;
+  // background-color:#e5ff9f
+  margin:10px;
   height:35px;
-  width:100px;
+  // width:100px;
   padding:0;
   border-width:0;
 `
