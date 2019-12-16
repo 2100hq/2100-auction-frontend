@@ -94,7 +94,6 @@ export default wiring.connect((props)=>{
           </Box>
           <hr/>
           <Box width='100%'>
-        
             { false ? 
               <Box width='100%'>
                 <h6>
@@ -105,43 +104,47 @@ export default wiring.connect((props)=>{
             }
             <Flex justifyContent='space-around'>
               <AuctionChart newBid={bid} auction={auction} auctionManager={token} myAddress={myAddress}/>
-              <Flex flexDirection='column' justifyContent='center'>
-                <Flex flexWrap='wrap' justifyContent='center' alignItems='center'>
+              <Flex flexDirection='column' justifyContent='space-around' alignItems='center'>
+                <Flex flexWrap='wrap' justifyContent='center' alignItems='flex-end'>
                   <Flex flexDirection='column' justifyContent='center'>
-                      { 
-                        bid && 
-                        !isNaN(bid) && 
-                        parseFloat(bid) != 0 && 
-                        parseFloat(bid) < .0001 ? 
-                          <Tiny> {humanizeWei(toWei(bid),4)} </Tiny> : null
-                      }
-                      <BurnInput 
-                        disabled={disableInput}
-                        onChange={e=>setBid(e.target.value)} value={bid}
-                      />
-                    </Flex>
-                    <Flex alignItems='flex-end' >
-                      <P>ETH gets <strong>1 ${auction.name}</strong></P> 
-                      <Tiny>(<Link onClick={x=>setShow(true)} >or less</Link>)</Tiny> 
-                    </Flex>
+                    { 
+                      bid && 
+                      !isNaN(bid) && 
+                      parseFloat(bid) != 0 && 
+                      parseFloat(bid) < .0001 ? 
+                        <Tiny> {humanizeWei(toWei(bid),4)} </Tiny> : null
+                    }
+                    <BurnInput 
+                      disabled={disableInput}
+                      onChange={e=>setBid(e.target.value)} value={bid}
+                    />
                   </Flex>
-                  <BidButton 
-                    disabled={disableInput}
-                    donate={donate} 
-                    name={auction.name} 
-                    value={bid} 
-                    onClick={()=>{setBid(''); setDisableInput(false)}}
-                    onSubmit={()=>setDisableInput(true) }
-                  />
+                  <Flex alignItems='flex-end' >
+                    <P>ETH gets <strong>1 ${auction.name}</strong></P> 
+                    <Tiny>(<Link onClick={x=>setShow(true)} >or less</Link>)</Tiny> 
+                  </Flex>
                 </Flex>
-                <Flex margin='10px' width='200px' className='form-check'>
-                  <input className='form-check-input' id='donate' name='donate' type='checkbox' checked={donate} onChange={e=>setDonate(!donate)}/> 
-                  <label className='form-check-label' htmlFor='donate'>
-                    <Tiny>Donate my eth to the 2100 project instead of burning it</Tiny>
-                  </label>
-                </Flex>
+                <BidButton 
+                  disabled={disableInput}
+                  donate={donate} 
+                  name={auction.name} 
+                  value={bid} 
+                  onClick={()=>{setBid(''); setDisableInput(false)}}
+                  onSubmit={()=>setDisableInput(true) }
+                />
+              </Flex>
             </Flex>
           </Box>
+        </Row>
+        <Row>
+          <Flex width='100%' justifyContent='center'>
+            <Flex margin='10px' width='200px' className='form-check'>
+              <input className='form-check-input' id='donate' name='donate' type='checkbox' checked={donate} onChange={e=>setDonate(!donate)}/> 
+              <label className='form-check-label' htmlFor='donate'>
+                <Tiny>Donate my eth to the 2100 project instead of burning it</Tiny>
+              </label>
+            </Flex>
+          </Flex>
         </Row>
         <Row>
           <Hr/>
