@@ -4,26 +4,38 @@ import {normalizedAuctionPrice,normalizedAuctionTime} from '../../utils'
 export default (config={}, {table,BigNumber}, emit=x=>x)=>{
 
   const {
-    startPrice="10000000000000000000",
-    endPrice='1',
+    // startPrice="10000000000000000000",
+    // endPrice='1',
     duration=900
   } = config
 
-  const totalPriceChange = new BigNumber(startPrice).minus(endPrice)
+  // const totalPriceChange = new BigNumber(startPrice).minus(endPrice)
+  //
+  function defaults(props){
+    return {
+      isActive:false,
+      auctionId:0,
+      deposits:0,
+      endTime:0,
+      startTime:0,
+      secondsPassed:0,
+      secondsRemaining:0,
+      currentTime:0,
+      done:false,
+      ...props
+
+    }
+  }
 
   function parse(props){
     return {
       ...props,
-      auctionId:props.auctionId.toString(),
+      auctionId:parseInt(props.auctionId.toString()),
       deposits:props.deposits.toString(),
       endTime:props.endTime.toString(),
-      finalPrice:props.finalPrice.toString(),
       secondsPassed:props.secondsPassed.toString(),
       secondsRemaining:props.secondsRemaining.toString(),
       startTime:props.startTime.toString(),
-      //new props for graphing
-      currentEndTime:(props.currentEndTime || 0).toString(),
-      currentEndPrice:(props.currentEndPrice || 0).toString(),
       currentTime:(props.currentTime || 0).toString()
     }
   }
@@ -36,7 +48,7 @@ export default (config={}, {table,BigNumber}, emit=x=>x)=>{
 
   function set(auction){
     assert(auction.id,'requires auction id')
-    auction = parse(auction)
+    auction = parse(defaults(auction))
     table.set(auction.id,auction)
     emit(auction.id,auction)
     return auction
@@ -67,7 +79,7 @@ export default (config={}, {table,BigNumber}, emit=x=>x)=>{
 
 
   function create(props){
-    const id = makeId(props)
+    const id = makeId(defaults(props))
     assert(!has(id),'Auction already exists')
     return set({
       id,
@@ -79,7 +91,7 @@ export default (config={}, {table,BigNumber}, emit=x=>x)=>{
     assert(amount,'requires amount')
     const auction = get(id)
     auction.deposits = amount.toString()
-    if(auction.isActive === false && auction.isStopReached === false){
+    if(auction.isActive === false){
       auction.isActive = true
       auction.startTime = startTime.toString()
       auction.endTime = endTime.toString()
@@ -102,34 +114,41 @@ export default (config={}, {table,BigNumber}, emit=x=>x)=>{
 
     const nowS = Math.min(parseInt(now/1000),parseInt(auction.endTime))
 
-    const percentTime = new BigNumber(nowS).minus(auction.startTime).dividedBy(duration)
-    const currentPrice = normalizedAuctionPrice({percent:percentTime,startPrice,endPrice})
+    // const percentTime = new BigNumber(nowS).minus(auction.startTime).dividedBy(duration)
+    // const currentPrice = normalizedAuctionPrice({percent:percentTime,startPrice,endPrice})
 
-    const percentPrice = new BigNumber(1).minus(new BigNumber(auction.deposits).dividedBy(totalPriceChange))
-    const currentEndTime = normalizedAuctionTime({percent:percentPrice,...auction})
+    // const percentPrice = new BigNumber(1).minus(new BigNumber(auction.deposits).dividedBy(totalPriceChange))
+    // const currentEndTime = normalizedAuctionTime({percent:percentPrice,...auction})
 
-    auction.currentEndTime = currentEndTime.toString().split('.')[0]
-    auction.currentEndPrice = auction.deposits
+    // auction.currentEndTime = currentEndTime.toString().split('.')[0]
+    // auction.currentEndPrice = auction.deposits
     auction.currentTime = nowS
-
-    const secondsPassed = percentTime.times(duration)
+    const secondsPassed = new BigNumber(auction.currentTime).minus(auction.startTime)
     auction.secondsPassed = secondsPassed.toString().split('.')[0]
     auction.secondsRemaining = new BigNumber(duration).minus(secondsPassed).toString().split('.')[0]
 
-    // console.log(percentTime.toString(),currentPrice.toString(),percentPrice.toString(),currentEndTime.toString())
-    if(percentTime.gte(1)){
+    if(new BigNumber(auction.currentTime).gte(auction.endTime)){
       auction.isActive = false
       if(new BigNumber(auction.deposits).gt(0)){
-        auction.isStopReached = true
-        auction.finalPrice = auction.deposits
+        auction.done = true
       }
     }
 
-    if(currentPrice.lt(auction.deposits)){
-      auction.currentPrice = auction.deposits
-    }else{
-      auction.currentPrice = currentPrice.toString().split('.')[0]
-    }
+
+    // // console.log(percentTime.toString(),currentPrice.toString(),percentPrice.toString(),currentEndTime.toString())
+    // if(percentTime.gte(1)){
+    //   auction.isActive = false
+    //   if(new BigNumber(auction.deposits).gt(0)){
+    //     auction.isStopReached = true
+    //     auction.finalPrice = auction.deposits
+    //   }
+    // }
+
+    // if(currentPrice.lt(auction.deposits)){
+    //   auction.currentPrice = auction.deposits
+    // }else{
+    //   auction.currentPrice = currentPrice.toString().split('.')[0]
+    // }
 
     return auction
   }

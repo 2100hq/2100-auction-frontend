@@ -9,7 +9,8 @@ export default (config, {table,BigNumber}, emit=x=>x)=>{
 
   function set(auction){
     assert(auction.id,'requires auction id')
-    table.set(auction.id,parse(auction))
+    auction = parse(auction)
+    table.set(auction.id,auction)
     emit(auction.id,auction)
     return auction
   }
@@ -40,10 +41,20 @@ export default (config, {table,BigNumber}, emit=x=>x)=>{
       maximumSupply:props.maximumSupply.toString(),
       amount:props.amount.toString(),
       duration:props.duration.toString(),
-      startPrice:props.startPrice.toString(),
-      endPrice:props.endPrice.toString(),
-      totalPriceChange:props.totalPriceChange.toString(),
+      // startPrice:props.startPrice.toString(),
+      // endPrice:props.endPrice.toString(),
+      // totalPriceChange:props.totalPriceChange.toString(),
     }
+  }
+
+  function setCurrent(id,number){
+    const data = get(id)
+
+    return set({
+      ...data,
+      currentAuctionId:number,
+    })
+
   }
 
   function create(props){
@@ -60,6 +71,7 @@ export default (config, {table,BigNumber}, emit=x=>x)=>{
     get,
     del,
     has,
+    setCurrent,
     makeId,
   }
 

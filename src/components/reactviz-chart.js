@@ -5,7 +5,7 @@ import wiring from '../wiring'
 import dayjs from 'dayjs'
 import {toEth} from '../utils'
 
-export function AuctionChart({auction,auctionManager}){
+export function AuctionChart({auction,auctionManager,width=800,height=400}){
   console.log({auction})
   const startEndPrice = [
     {
@@ -32,13 +32,13 @@ export function AuctionChart({auction,auctionManager}){
   ]
 
   return <XYPlot
-    width={800}
-    height={400}
+    width={width}
+    height={height}
     color='gray'
     yDomain={[auctionManager.endPrice,auctionManager.startPrice]}
     margin={{
-      left:150,
-      bottom:100
+      left:70,
+      bottom:70
     }}
     style={{
       fontSize:'10'

@@ -1,23 +1,26 @@
 import assert from 'assert'
+import bigjs from 'big.js'
+import lodash from 'lodash'
+
 export async function loop(fn,delay,...args){
   await fn(...args)
   await new Promise(res=>setTimeout(res,delay))
   return loop(fn,delay,...args)
 }
 
-export const BigNumber = window.web3.BigNumber
+export const BigNumber = bigjs
 
 export function auctionPrice({startPrice,endPrice,currentTime,startTime,endTime}){
   const secondsPassed = new BigNumber(currentTime).minus(startTime)
   const duration = new BigNumber(endTime).minus(startTime)
-  const percent = secondsPassed.dividedBy(duration)
+  const percent = secondsPassed.div(duration)
   return normalizedAuctionPrice({startPrice,endPrice,percent})
   // currentTime = new BigNumber(currentTime)
   // if(currentTime.gte(endTime)) return endPrice
   // const secondsPassed = currentTime.minus(startTime)
   // const totalPriceChange = new BigNumber(startPrice).minus(endPrice)
   // const duration = new BigNumber(endTime).minus(startTime)
-  // const currentPriceChange = totalPriceChange.times(secondsPassed).dividedBy(duration)
+  // const currentPriceChange = totalPriceChange.times(secondsPassed).div(duration)
   // return new BigNumber(startPrice).minus(currentPriceChange)
 }
 
@@ -34,7 +37,44 @@ export function normalizedAuctionTime({percent=0,startTime=0,endTime=0}){
   return (new BigNumber(startTime).plus(duration.times(percent)))
 }
 
-
-export function toEth(wei){
-  return window.web3.fromWei(wei)
+export function toWei(eth){
+  eth = new BigNumber(eth)
+  return eth.times(1e18).toString()
 }
+
+export function toEth(wei,fixed=2){
+  wei = new BigNumber(wei)
+  return wei.div(1e18).toFixed(fixed)
+  // return window.web3.fromWei(wei)
+}
+
+export function humanizeWei(wei,fixed=2){
+  wei = new BigNumber(wei)
+  if(wei.eq(0)) return '0 ETH'
+
+  if(wei.lte(`1e${8-fixed}`)){
+    return `${wei.toString()} WEI`
+  }
+
+  if(wei.lte(`1e${17-fixed}`)){
+    return `${wei.div(1e9).toFixed(fixed)} GWEI`
+  }
+
+  return `${wei.div(1e18).toFixed(fixed)} ETH`
+
+}
+
+//maybe replace this without using lodash
+export function set(state,path=[],data){
+  return lodash.setWith(state,path,data,Object)
+}
+
+export function get(state,path=[],fallback){
+  if(path.length == 0) return state || fallback
+  return lodash.get(state,path,fallback)
+}
+
+export function unset(state,path){
+  return lodash.unset(state,path)
+}
+

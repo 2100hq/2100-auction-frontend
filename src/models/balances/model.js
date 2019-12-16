@@ -4,8 +4,8 @@ export default (config, {table}, emit=x=>x)=>{
 
   function makeId(props){
     assert(props.address,'requires address')
-    assert(props.tokenName,'requires tokenName')
-    return [props.address,props.tokenName].join('!')
+    assert(props.name,'requires name')
+    return [props.address,props.name].join('!')
   }
 
   function set(props){
@@ -38,7 +38,7 @@ export default (config, {table}, emit=x=>x)=>{
       ...props,
       id:props.id.toString(),
       address:props.address.toString(),
-      tokenName:props.tokenName.toString(),
+      name:props.name.toString(),
       tokenAddress:props.tokenAddress.toString(),
       balance:props.balance.toString(),
     }

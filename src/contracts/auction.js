@@ -35,7 +35,7 @@ export default async (config,libs) => {
     if(isActive) return '0'
     if(!isStopReached) return '0'
     const bid = new BigNumber(await contract.methods.getBid(id,address).call())
-    return bid.dividedBy(deposits).toString()
+    return bid.div(deposits).toString()
   }
 
   async function getBid(id,address){

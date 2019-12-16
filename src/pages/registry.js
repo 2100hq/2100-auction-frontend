@@ -8,13 +8,10 @@ const AuctionLink = ({name})=>{
 }
 
 export default wiring.connect((props)=>{
-  console.log(props)
-  const {registries,registryid,query} = props
   const [newAuction,setNewAuction] = useState('')
+  const {registry} = props
   
-  if(registries == null || registries[registryid] == null ) return <p> Loading </p>
-
-  const registry = registries[registryid]
+  if(!registry) return <p> Loading </p>
 
   return <div>
     <p> Registry: {registry.name} </p>

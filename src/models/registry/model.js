@@ -2,30 +2,39 @@ import assert from 'assert'
 
 export default (config, {table}, emit=x=>x)=>{
 
+
+  function defaults(props={}){
+    return {
+      strings:[],
+      ...props,
+    }
+  }
+
   function makeId(props){
     assert(props.id,'requires registryid')
     return props.id
   }
 
-  function set(auction){
-    assert(auction.id,'requires auction id')
-    table.set(auction.id,parse(auction))
-    emit(auction.id,auction)
-    return auction
+  function set(props){
+    assert(props.id,'requires registry id')
+    props = defaults(parse(props))
+    table.set(props.id,props)
+    emit(props.id,props)
+    return props
   }
 
   function get(id){
     assert(id,'requires id to get')
     const result = table.get(id)
-    assert(result,'no such auction by id: ' + id)
+    assert(result,'no such registry by id: ' + id)
     return result
   }
 
-  function del(auction){
-    assert(auction.id,'requires auction id')
-    table.delete(auction.id)
-    emit(auction.id)
-    return auction
+  function del(props){
+    assert(props.id,'requires registry id')
+    table.delete(props.id)
+    emit(props.id)
+    return props
   }
 
   function has(id){

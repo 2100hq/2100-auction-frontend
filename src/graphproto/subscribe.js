@@ -46,19 +46,19 @@ export default async (config,{query,loop},emit=x=>x) => {
     // if(data) emit(['registries',data.id],data)
     if(data) emit('registries',data)
   })
-  const tokenBalances = Subscriber(query.getTokenBalanceById,data=>{
+  const balances = Subscriber(query.getBalanceById,data=>{
     // if(data) emit(['tokenBalances',data.address,data.tokenName],data.balance)
     if(data) emit('balances',data)
   })
-  const auctionBalances = Subscriber(query.getAuctionBalanceById,data=>{
+  const bids = Subscriber(query.getBidById,data=>{
     // if(data) emit(['auctionBalances',data.address,data.auctionName,data.auctionId],data.bids)
     if(data) emit('bids',data)
   })
-  const auctionBidsByAddress = Subscriber(query.getAuctionBidsByAddress,data=>{
+  const bidsByAddress = Subscriber(query.getBidsByAddress,data=>{
     // if(data) emit(['auctionBidsByAddress'],data)
     if(data) data.forEach(bid=>emit('bids',bid))
   })
-  const tokenBalancesByAddress = Subscriber(query.getTokenBalancesByAddress,data=>{
+  const balancesByAddress = Subscriber(query.getBalancesByAddress,data=>{
     // if(data) emit(['tokenBalancesByAddress'],data)
     if(data) data.forEach(balance=>emit('balances',balance))
   })
@@ -67,10 +67,10 @@ export default async (config,{query,loop},emit=x=>x) => {
     await registries.tick()
     await auctionManagers.tick()
     await auctions.tick()
-    await tokenBalances.tick()
-    await auctionBalances.tick()
-    await auctionBidsByAddress.tick()
-    await tokenBalancesByAddress.tick()
+    await balances.tick()
+    await bids.tick()
+    await bidsByAddress.tick()
+    await balancesByAddress.tick()
   },interval).catch(err=>{
     console.log('graphql subscription error',err)
   })
@@ -79,9 +79,9 @@ export default async (config,{query,loop},emit=x=>x) => {
     auctions,
     auctionManagers,
     registries,
-    tokenBalances,
-    auctionBalances,
-    auctionBidsByAddress,
-    tokenBalancesByAddress,
+    balances,
+    bids,
+    bidsByAddress,
+    balancesByAddress,
   }
 }

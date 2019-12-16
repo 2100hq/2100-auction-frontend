@@ -8,8 +8,8 @@ export default (config, {table}, emit=x=>x)=>{
       id:props.id.toString(),
       address:props.address.toString(),
       auctionId:props.auctionId.toString(),
-      auctionName:props.auctionName.toString(),
-      bids:props.bids.toString(),
+      name:props.name.toString(),
+      amount:props.amount.toString(),
     }
   }
 

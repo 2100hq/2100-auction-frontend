@@ -39,9 +39,6 @@ export default async (config,{apollo,gql}) => {
         maximumSupply
         amount
         duration
-        startPrice
-        endPrice
-        totalPriceChange
       }
     }`,'auctionManager')
   }
@@ -53,13 +50,10 @@ export default async (config,{apollo,gql}) => {
         address,
         name,
         isActive,
-        isStopReached,
         startTime,
         endTime,
         secondsPassed,
         secondsRemaining,
-        currentPrice,
-        finalPrice,
         deposits,
         auctionId,
       }
@@ -70,50 +64,68 @@ export default async (config,{apollo,gql}) => {
     return getAuctionById(`${name}!${id}`)
   }
 
-  function getAuctionBalanceById(id){
+  function getBidById(id){
     return query(`{
-      auctionBalance(id:"${id}"){
-        id address auctionId auctionName bids
+      bid(id:"${id}"){
+        id address auctionId name amount
       }
-    }`,'auctionBalance')
+    }`,'bid')
   }
 
-  function getAuctionBalance(address,name,id){
-      return getAuctionBalanceById(`${address}!${name}!${id}`)
+  function getBid(address,name,id){
+      return getBidById(`${address}!${name}!${id}`)
   }
 
-  function getTokenBalanceById(id){
+  function getBalanceById(id){
     assert(id,'requires id')
     return query(`{
-      tokenBalance(id:"${id}"){
-        id address tokenAddress tokenName balance
+      balance(id:"${id}"){
+        id address tokenAddress name balance
       }
-    }`,'tokenBalance')
+    }`,'balance')
   }
 
-  function getTokenBalance(address,name){
-    return getTokenBalanceById(`${address}!${name}`)
+  function getBalance(address,name){
+    return getBalanceById(`${address}!${name}`)
   }
 
-  function getTokenBalances(address,names=[]){
-    return Promise.all(names.map(name=>getTokenBalance(address,name)))
+  function getBalances(address,names=[]){
+    return Promise.all(names.map(name=>getBalance(address,name)))
   }
 
-  function getTokenBalancesByAddress(address){
+  function getBalancesByAddress(address){
     assert(address,'requires address')
     return query(`{
-      tokenBalances(where:{balance_gt:0 address:"${address}"}){
-        id address tokenAddress tokenName balance
+      balances(where:{balance_gt:0 address:"${address}"}){
+        id address tokenAddress name balance
       }
-    }`,'tokenBalances')
+    }`,'balances')
   }
 
-  function getAuctionBalances(address,name,ids=[]){
-    return Promise.all(ids.map(id=>getAuctionBalance(address,name,id)))
+  function getBids(address,name,ids=[]){
+    return Promise.all(ids.map(id=>getBid(address,name,id)))
   }
 
   function getAuctions(name,ids=[]){
     return Promise.all(ids.map(id=>getAuction(name,id)))
+  }
+
+  function getDoneAuctionsByName(name,now){
+    now = parseInt((now || Date.now())/1000)
+    return query(`{
+      auctions(where:{endTime_lte:${now} name:"${name}" deposits_gt:0}){
+        id,
+        address,
+        name,
+        isActive,
+        startTime,
+        endTime,
+        secondsPassed,
+        secondsRemaining,
+        deposits,
+        auctionId,
+      }
+    }`,'auctions')
   }
 
   function getDoneAuctions(now){
@@ -125,26 +137,23 @@ export default async (config,{apollo,gql}) => {
         address,
         name,
         isActive,
-        isStopReached,
         startTime,
         endTime,
         secondsPassed,
         secondsRemaining,
-        currentPrice,
-        finalPrice,
         deposits,
         auctionId,
       }
     }`,'auctions')
   }
 
-  function getAuctionBidsByAddress(address){
+  function getBidsByAddress(address){
     assert(address,'requires address')
     return query(`{
-      auctionBalances(where:{bids_gte:0 address:"${address}"}){
-        id bids auctionName address auctionId
+      bids(where:{amount_gte:0 address:"${address}"}){
+        id amount name address auctionId
       }
-    }`,'auctionBalances')
+    }`,'bids')
   }
 
   return {
@@ -153,15 +162,16 @@ export default async (config,{apollo,gql}) => {
     getAuctionById,
     getAuction,
     getAuctions,
-    getAuctionBalanceById,
-    getAuctionBalance,
-    getAuctionBalances,
     getDoneAuctions,
-    getTokenBalanceById,
-    getTokenBalance,
-    getTokenBalances,
-    getAuctionBidsByAddress,
-    getTokenBalancesByAddress,
+    getDoneAuctionsByName,
+    getBidById,
+    getBid,
+    getBids,
+    getBidsByAddress,
+    getBalanceById,
+    getBalance,
+    getBalances,
+    getBalancesByAddress,
     query,
   }
 }

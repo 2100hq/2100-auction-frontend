@@ -12,12 +12,15 @@ export default (config={},libs) => {
   const contract = new ethers.Contract(address,abi,provider)
 
   function create(name){
+    assert(name,'requires auction name')
     return contract.create(name)//,{gasLimit:'0x' + new BigNumber('6721975').toString(16)})
   }
   function destroyString(name){
+    assert(name,'requires auction name')
     return contract.destroyString(name)
   }
   function stringToAddress(name){
+    assert(name,'requires auction name')
     return contract.stringToAddress(name)
   }
 

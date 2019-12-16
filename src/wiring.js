@@ -6,7 +6,6 @@ const defaultState = {}
 
 const reducers = {
   set(state,path,data){
-    // console.log('set',path,data)
     if(data){
       lodash.setWith(state,path,data,Object)
     }else{
@@ -15,6 +14,18 @@ const reducers = {
     // console.log('state',{...state})
     return {
       ...state
+    }
+  },
+  setDonate(state,donate){
+    console.log('wiring',{donate})
+    if(donate){
+      localStorage.setItem('donate','1')
+    }else{
+      localStorage.removeItem('donate')
+    }
+    return {
+      ...state,
+      donate
     }
   },
   success(state,success){

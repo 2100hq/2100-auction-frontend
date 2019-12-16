@@ -14,12 +14,29 @@ export default (config,libs) => {
     return contract.tickAuction()
   }
 
-  async function bid(value){
-    return contract.bid({value:new BigNumber(value)})
+  async function bid(value,donate = new BigNumber(0)){
+    value = new BigNumber(value)
+    donate = new BigNumber(donate)
+    assert(value.gt(0),'Requires bid above 0')
+    assert(donate.gte(0),'Requires bid above 0')
+    return contract.bid(donate,{value})
   }
 
-  async function claim(id,donate){
-    return contract.claimTokens(id,donate)
+  //no longer used
+  async function claimAndDonate(id,donate){
+    assert(id,'requires auction id')
+    assert(donate,'requires donation amount')
+    return contract.claimTokens(id,donate.toString())
+  }
+
+  async function claim(id){
+    assert(id,'requires auction id')
+    return contract.claimTokens(id)
+  }
+
+  async function claimAll(ids=[]){
+    assert(ids.length,'requires auction ids')
+    return contract.batchClaimTokens(ids)
   }
 
   // uint256 auctionId,
@@ -45,6 +62,8 @@ export default (config,libs) => {
   return {
     bid,
     claim,
+    claimAndDonate,
+    claimAll,
     tickAuction,
     getAuction,
   }
