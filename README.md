@@ -9,6 +9,10 @@ REACT_APP_GRAPH_QUERY=
 
 ## Available Scripts
 
+On first run, install dependencies with
+
+### `yarn install`
+
 In the project directory, you can run:
 
 ### `yarn start`
