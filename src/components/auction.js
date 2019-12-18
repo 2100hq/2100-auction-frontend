@@ -1,9 +1,81 @@
 import React, {useEffect, useState} from 'react';
-import wiring from '../wiring'
-import {Flex,Hr,Box,Tiny,Small,Strong} from '../styles'
+import {useWiring} from '../wiring'
+import {Flex,Hr,Box,Tiny,Small,Strong,P} from '../styles'
 import {Link} from 'react-router-dom'
 import dayjs from 'dayjs'
 import {BigNumber,toEth,humanizeWei} from '../utils'
+import {Table} from 'react-bootstrap'
+import {ClaimButton} from './buttons'
+
+export const AuctionNavigation = ({min=0,max,current,name,onClick})=>{
+  return <Flex>
+    {
+      current > 0 ? 
+      <Box marginRight={20}>
+        <Link to={`/auctions/${name}/${current-1}`}>Previous</Link>
+      </Box>
+      : null
+    }
+  { 
+    current < max ?
+      <Box marginRight={20}>
+        <Link to={`/auctions/${name}/${current+1}`}>Next</Link>
+      </Box>
+      : null
+  }
+  {
+    current < max ?
+      <Box >
+        <Link to={`/auctions/${name}`}>Latest</Link>
+      </Box>
+      : null
+  }
+  </Flex>
+}
+
+export const CanClaim = ({bid}) => { 
+  const [{myAddress}] = useWiring(['myAddress'])
+  if(bid.claim == '0') return <div/>
+  if(bid.address != myAddress) return <div/>
+  if(bid.isActive ) return <div/>
+  return <ClaimButton name={bid.name} auctionId={bid.auctionId}/>
+}
+
+export const SmallBidRows = ({bids={}})=>{
+  bids = Object.values(bids)
+  return <React.Fragment>
+    {
+      bids.map(bid=>{
+        return <tr>
+          <td><Small> {bid.address} </Small></td>
+          <td><Small> {humanizeWei(bid.amount)} </Small></td>
+          <td><Small> {toEth(bid.claim)} ETH</Small></td>
+          <td><CanClaim bid={bid}/></td>
+        </tr>
+      })
+    }
+  </React.Fragment>
+}
+
+export const AuctionDone = ({auction}) =>{
+  return <Box width='100%'>
+    <P><Strong> ${auction.name}</Strong></P>
+    <P><Small>Auction {auction.auctionId} {auction.isActive ? <Link to={`/auctions/${auction.name}`}> Running</Link> : 'Finished'} </Small></P>
+    <Table responsive>
+      <thead>
+        <tr>
+          <th><Small> Address </Small></th>
+          <th><Small > Bid Amount </Small></th>
+          <th><Small > Withdrawable </Small></th>
+          <th><Small > </Small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <SmallBidRows bids={auction.bids}/>
+      </tbody>
+    </Table>
+  </Box>
+}
 
 
 async function findLatestAuction(contract,index=0){
@@ -14,10 +86,12 @@ async function findLatestAuction(contract,index=0){
 
 
 
-export const LatestAuction = wiring.connect(({name,auctions,myAddress,balance}) =>{
+export const LatestAuction = (props) =>{
+  const [{name,auctions,myAddress,balance}] = useWiring(['name','auctions','myAddress','balance'])
+
   return <div>
     {auctions ? <Auction auction={auctions[name]} myAddress={myAddress} balance={balance}/> : null} </div>
-})
+}
 
 export const Auction = ({
   auction,
@@ -55,7 +129,7 @@ export const AuctionCard = ({auction})=>{
   return <Flex minWidth='256px' flexDirection='column' >
     <Flex justifyContent='space-between' alignItems='center'>
       <Strong>	
-        &#x25d1; <Link to={`/auctions/${auction.name}/${auction.auctionId}`}>Auction {auction.auctionId}</Link> 
+        &#x25d1; <Link to={`/auctions/${auction.name}/${auction.auctionId}`}>Auction {1+parseInt(auction.auctionId)}</Link> 
       </Strong>
       <Tiny> {dayjs().diff(parseInt(auction.endTime) * 1000,'day',true).toFixed(2)} days ago
       </Tiny>
@@ -80,12 +154,9 @@ export const AuctionHistory = ({auctions={}})=>{
   </Flex>
 }
 
-export const AuctionDoneCard = ({auction={}})=>{
-}
-
 export const AuctionListItem = ({auction={}})=>{
   return <Flex justifyContent='space-between'>
-    <Link to={`/auctions/${auction.name}`}>{auction.name}</Link>
+    <Link to={`/auctions/${auction.name}`}>${auction.name}</Link>
   </Flex>
 }
 

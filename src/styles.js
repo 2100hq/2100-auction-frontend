@@ -118,6 +118,7 @@ export const UnitButton = styled.div`
 
 export const P = styled.p`
   margin:0;
+  ${margin}
 `
 
 export const Small = styled(P)`

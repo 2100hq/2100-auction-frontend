@@ -7,7 +7,7 @@ export default async (config,libs,emit=x=>x) => {
 
   const connect = await Connect(config,libs)
   const query = await Query(config,connect)
-  const subscribe = await Subscribe(config,{query,loop},emit)
+  const subscribe = await Subscribe(config,connect,emit)
 
   return {
     ...connect,

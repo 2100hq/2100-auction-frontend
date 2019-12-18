@@ -20,6 +20,10 @@ export default (config, {table}, emit=x=>x)=>{
     return [props.address,props.auctionName,props.auctionId].join('!')
   }
 
+  function list(){
+    return [...table.values()]
+  }
+
   function set(props){
     assert(props.id,'requires bid id')
     table.set(props.id,parse(props))
@@ -66,6 +70,8 @@ export default (config, {table}, emit=x=>x)=>{
     get,
     del,
     has,
+    list,
+    update,
     makeId,
   }
 

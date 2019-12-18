@@ -1,7 +1,7 @@
 import React, {useState,useEffect} from 'react';
 import {Link,useParams} from 'react-router-dom'
-import wiring from '../wiring'
-import {Auction,AuctionHistory,SmallAuctionTable} from '../components/auction'
+import {useWiring} from '../wiring'
+import {AuctionNavigation,Auction,AuctionHistory,SmallAuctionTable,AuctionDone} from '../components/auction'
 import { BidButton } from '../components/buttons'
 import {Flex,ApplePanel,Hr,Tiny,Box, BurnInput, UnitButton, Vr,Strong, P} from '../styles'
 // import {AuctionChart} from '../components/apexchart'
@@ -15,9 +15,10 @@ import Modal from '../components/modals'
 
 
 
-export default wiring.connect((props)=>{
-  const {registry={strings:[]},manager,ethers,query,subscribe,dispatch,donate,myAddress} = props
+export default (props)=>{
   const {name} = useParams()
+  const [{registry={strings:[]},donate,myAddress,query},,dispatch] 
+    = useWiring([`registry.tokens.${name}`,'donate','myAddress'],name)
   const [bid,setBid] = useState('')
   const [show,setShow] = useState(false)
   const [disableInput,setDisableInput] = useState(false)
@@ -29,41 +30,37 @@ export default wiring.connect((props)=>{
   //run once
   useEffect(x=>{
     query.getDoneAuctionsByName(name).then(setHistory).catch(dispatch('setError'))
-    subscribe.auctionManagers.on(name)
-    return ()=>{
-      subscribe.auctionManagers.off(name)
-    }
   },[name])
 
-  //once our auction manager exists subscribe to the particular auction
-  useEffect(x=>{
-    if(!token) return
+  ////once our auction manager exists subscribe to the particular auction
+  //useEffect(x=>{
+  //  if(!token) return
 
-    const id = `${name}!${token.currentAuctionId}`
-    subscribe.auctions.on(id)
+  //  const id = `${name}!${token.currentAuctionId}`
+  //  subscribe.auctions.on(id)
 
-    const bidid = `${myAddress}!${name}!${token.currentAuctionId}`
-    subscribe.bids.on(bidid)
+  //  const bidid = `${myAddress}!${name}!${token.currentAuctionId}`
+  //  subscribe.bids.on(bidid)
 
-    return ()=>{
-      subscribe.auctions.off(id)
-      subscribe.bids.off(bidid)
-    }
-  },[token ? token.id : null])
+  //  return ()=>{
+  //    subscribe.auctions.off(id)
+  //    subscribe.bids.off(bidid)
+  //  }
+  //},[token ? token.id : null])
 
-  // console.log({token,registry})
 
-  if(!registry) return <p> Loading </p>
+  if(!registry || !registry.strings) return <p> Loading </p>
   if(!token) return <p> Loading </p>
 
   const auction = get(token,['auctions',token.currentAuctionId])
+  const auctionId = parseInt(token.currentAuctionId)
 
   if(!auction || !auction.id) return <p> Loading </p>
 
-  let auctionNumber = auction.auctionId
-  if(auction.done){
-    auctionNumber++
-  }
+  let auctionNumber = parseInt(auction.auctionId)
+  // if(auction.done){
+  //   auctionNumber++
+  // }
 
   return <div>
     <Modal
@@ -86,9 +83,10 @@ export default wiring.connect((props)=>{
       <Col md={9}>
         <Row>
           <Box width='100%'>
+            <AuctionNavigation max={auctionId} current={auctionId} name={auction.name}/>
             <h1>${auction.name} &nbsp; &nbsp; </h1>
             <Flex justifyContent='space-between'>
-              <h5><Strong>Auction {auctionNumber} of {toEth(token.maximumSupply,0)} </Strong></h5>
+              <h5><Strong>Auction {auctionNumber+1} of {toEth(token.maximumSupply,0)} </Strong></h5>
               {auction.isActive ? <Strong>Ends in {humanize(new BigNumber(auction.secondsRemaining).times(1000).toString())} </Strong> : null}
             </Flex>
           </Box>
@@ -148,7 +146,7 @@ export default wiring.connect((props)=>{
         </Row>
         <Row>
           <Hr/>
-          <AuctionHistory auctions={[...history].reverse()}/>
+          <AuctionHistory auctions={[...history].sort((a,b)=>parseInt(b.auctionId)-parseInt(a.auctionId))}/>
         </Row>
       </Col>
       <Col xs={1}>
@@ -162,5 +160,5 @@ export default wiring.connect((props)=>{
     </Row>
 
   </div>
-})
+}
 

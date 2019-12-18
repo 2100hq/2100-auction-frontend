@@ -1,19 +1,17 @@
 import React from 'react';
 import lodash from 'lodash'
 import Wiring from 'react-wiring'
+import {set,unset} from '@daywiss/utils/set'
 
 const defaultState = {}
 
 const reducers = {
+  //shallow set, top level props only
   set(state,path,data){
-    if(data){
-      lodash.setWith(state,path,data,Object)
-    }else{
-      lodash.unset(state,path)
-    }
-    // console.log('state',{...state})
+    //unset with undefined data
     return {
-      ...state
+      ...state,
+      [path]:data
     }
   },
   setDonate(state,donate){
@@ -43,5 +41,5 @@ const reducers = {
   }
 }
 
-export default Wiring(React,defaultState,reducers)
+export const [useWiring,store] =  Wiring(React,reducers,defaultState)
 

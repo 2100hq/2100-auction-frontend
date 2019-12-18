@@ -1,12 +1,13 @@
 import assert from 'assert'
 import bigjs from 'big.js'
 import lodash from 'lodash'
-
+// import daywiss from '@daywiss/utils/set'
 export async function loop(fn,delay,...args){
   await fn(...args)
   await new Promise(res=>setTimeout(res,delay))
   return loop(fn,delay,...args)
 }
+ 
 
 export const BigNumber = bigjs
 
@@ -37,7 +38,7 @@ export function normalizedAuctionTime({percent=0,startTime=0,endTime=0}){
   return (new BigNumber(startTime).plus(duration.times(percent)))
 }
 
-export function toWei(eth){
+export function toWei(eth='0'){
   eth = new BigNumber(eth)
   return eth.times(1e18).toString()
 }
@@ -64,6 +65,11 @@ export function humanizeWei(wei,fixed=2){
 
 }
 
+export function timeout(fn,duration,...args){
+  const stop = setTimeout(fn,duration,...args)
+  return ()=>clearTimeout(stop)
+}
+
 //maybe replace this without using lodash
 export function set(state,path=[],data){
   return lodash.setWith(state,path,data,Object)
@@ -77,4 +83,21 @@ export function get(state,path=[],fallback){
 export function unset(state,path){
   return lodash.unset(state,path)
 }
+
+//this will make new objects along update path for change detection with react
+export function setRecursive(state={},path=[],data){
+  if(path.length == 0) return data 
+  const [head,...rest] = path
+  state[head] = setRecursive({...state[head]},rest,data)
+  return state
+}
+// export function set(state,path=[],data){
+//   return daywiss.set(state,path,data,Object)
+// }
+
+// export function get(state,path=[],fallback){
+//   if(path.length == 0) return state || fallback
+//   return daywiss.get(state,path,fallback)
+// }
+
 

@@ -3,7 +3,7 @@ import {
 }  from 'recharts';
 import React,{useRef,useCallback,useEffect,useState} from 'react';
 import ReactDOM from 'react-dom';
-import wiring from '../wiring'
+import {useWiring} from '../wiring'
 import dayjs from 'dayjs'
 import {toEth,BigNumber,humanizeWei,toWei,get} from '../utils'
 
@@ -20,7 +20,7 @@ export const AuctionChart = ({
   const bids = Object.values(get(auction,'bids',{}))
 
   const yourTotal = bids.reduce((sum,bid)=>{
-    console.log({bid})
+    // console.log({bid})
     if(bid.address != myAddress) return sum
     return sum.plus(bid.amount)
   },new BigNumber(0))
@@ -129,24 +129,23 @@ export const AuctionChart = ({
         }}
       />
     </PieChart>
+    <div style={{
+      zIndex:1,
+      margin:0,
+      position:'absolute',
+      left:width/2 - 25,
+      top:width/2 - 25,
+      width:50,
+      height:50,
+      background:'#d3d3d300',
+      display:'flex',
+      justifyContent:'center',
+      alignItems:'center',
+      flexDirection:'column',
+    }}>
+     <h6><strong>${auction.name}</strong></h6>
+    </div>
   </div>
-    // <div style={{
-    //   zIndex:1,
-    //   margin:0,
-    //   position:'absolute',
-    //   left:width/2 - 25,
-    //   top:width/2 - 25,
-    //   width:50,
-    //   height:50,
-    //   background:'#d3d3d300',
-    //   display:'flex',
-    //   justifyContent:'center',
-    //   alignItems:'center',
-    //   flexDirection:'column',
-    // }}>
-    //  <h1><strong>1</strong></h1>
-    //  <h6><strong>${auction.name}</strong></h6>
-    // </div>
       // <Pie 
       //   data={data} 
       //   isAnimationActive={false}

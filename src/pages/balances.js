@@ -1,53 +1,47 @@
 import React, {useState,useEffect} from 'react';
 import {Link} from 'react-router-dom'
-import wiring from '../wiring'
+import {useWiring} from '../wiring'
 import {ClaimButton} from '../components/buttons'
 import {humanizeWei} from '../utils'
 import {ClaimCard} from '../components/claim'
 import {Row,Col} from 'react-bootstrap'
 
-export default wiring.connect((props)=>{
-  const {
+export default (props)=>{
+  const [{
     myAddress,
-    dispatch,
     subscribe,
     query,
-    registries={},
-    registryid,
-    bids={},
-    balances={},
-    auctions={},
-    BigNumber,
+    registry,
     models,
-  } = props
+  },,dispatch] = useWiring(['myAddress','registry','bids'])
 
-  const registry = registries[registryid]
-  if(registry==null) return <div>Loading</div>
+  if(registry==null && registry.bids == null  ) return <div>Loading</div>
+  const {bids,balances} = registry
 
-  useEffect(x=>{
-    if(myAddress == null) return
-    // subscribe.balancesByAddress.on(myAddress)
-    subscribe.bidsByAddress.on(myAddress)
+  // useEffect(x=>{
+  //   if(myAddress == null) return
+  //   // subscribe.balancesByAddress.on(myAddress)
+  //   subscribe.bidsByAddress.on(myAddress)
 
-    return ()=>{
-      // subscribe.balancesByAddress.off(myAddress)
-      subscribe.bidsByAddress.off(myAddress)
-    }
-  },[myAddress])
+  //   return ()=>{
+  //     // subscribe.balancesByAddress.off(myAddress)
+  //     subscribe.bidsByAddress.off(myAddress)
+  //   }
+  // },[myAddress])
 
-  useEffect(x=>{
-    Object.values(bids).forEach(bid=>{
-      const id = [bid.name,bid.auctionId].join('!')
-      subscribe.auctions.on(id)
-    })
+  // useEffect(x=>{
+  //   Object.values(bids).forEach(bid=>{
+  //     const id = [bid.name,bid.auctionId].join('!')
+  //     subscribe.auctions.on(id)
+  //   })
 
-    return ()=>{
-      Object.values(bids).forEach(bid=>{
-        const id = [bid.name,bid.auctionId].join('!')
-        subscribe.auctions.off(id)
-      })
-    }
-  },[Object.values(bids).length])
+  //   return ()=>{
+  //     Object.values(bids).forEach(bid=>{
+  //       const id = [bid.name,bid.auctionId].join('!')
+  //       subscribe.auctions.off(id)
+  //     })
+  //   }
+  // },[Object.values(bids).length])
 
   return <Row>
     <Col auto/>
@@ -57,7 +51,7 @@ export default wiring.connect((props)=>{
     <Col auto/>
   </Row>
 
-})
+}
 
 // const AuctionBalances = ({BigNumber,balances={},auctions=[], auctionManagers={}}) =>{
 //   const fragment = Object.entries(balances).map(([name,auctionIds])=>{

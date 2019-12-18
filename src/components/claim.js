@@ -1,11 +1,15 @@
 import React, {useState,useEffect} from 'react';
 import {Link,useParams} from 'react-router-dom'
-import wiring from '../wiring'
+import {useWiring} from '../wiring'
 import humanize from 'humanize-duration'
 import {humanizeWei,toEth,toWei,BigNumber,get} from '../utils'
 import {ClaimAllButton} from './buttons'
 import {Modal,Button} from 'react-bootstrap'
 import {Flex,Box} from '../styles'
+
+export const ClaimAlert = props =>{
+  const [{registry,myAddress},dispatch] = useWiring(['registry.bids','myAddress'])
+}
 
 export const BidRow = (props)=>{
   const {name,amount,auctionIds} = props
@@ -14,7 +18,7 @@ export const BidRow = (props)=>{
       <h5>${name}</h5> 
     </Flex>
     <Flex width={256} marginLeft={20} justifyContent='flex-start'>
-      <h5>{toEth(amount,18)}</h5>
+      <h5>{toEth(amount)} ETH</h5>
     </Flex>
     <ClaimAllButton name={name} auctionIds={auctionIds} amount={amount}/>
   </Flex>
@@ -44,11 +48,16 @@ export const ClaimCard = props=>{
         amount:new BigNumber(0),
       }
     }
+
     result[bid.name].auctionIds.push(bid.auctionId)
-    result[bid.name].amount = result[bid.name].amount.plus(bid.amount)
+    result[bid.name].amount = result[bid.name].amount.plus(bid.claim)
+
+    // console.log(result[bid.name].amount.toString())
     return result
   },{})
 
+
+  // console.log({groupedBids})
 
   return <Flex flexDirection='column' alignItems='center'>
     <p> 
@@ -60,7 +69,7 @@ export const ClaimCard = props=>{
 }
   
 export const ClaimModal = (props={}) =>{
-  const {show,onHide,onClick,bids={}} = props
+  const {show,onHide,onClick,bids={},tokens} = props
   return <Modal 
     size='lg'
     show={show} 
@@ -72,7 +81,7 @@ export const ClaimModal = (props={}) =>{
     </Modal.Header>
 
     <Modal.Body>
-      <ClaimCard bids={bids}/>
+      <ClaimCard bids={bids} tokens={tokens}/>
     </Modal.Body>
 
     <Modal.Footer>
@@ -81,14 +90,13 @@ export const ClaimModal = (props={}) =>{
   </Modal>
 }
 
-export const ClaimModalButton = wiring.connect((props) =>{
-  const {
+export const ClaimModalButton = (props) =>{
+  const [{
     myAddress,
-    dispatch,
     subscribe,
     query,
     registry={},
-  } = props
+  },,dispatch] = useWiring(['myAddress','registry.bids'])
 
   const [show,setShow] = useState(false)
   const handleClose = () => setShow(false);
@@ -96,39 +104,18 @@ export const ClaimModalButton = wiring.connect((props) =>{
 
   const myBids = get(registry,['bids',myAddress],{})
 
-  useEffect(x=>{
-    if(myAddress == null) return
-    // subscribe.balancesByAddress.on(myAddress)
-    subscribe.bidsByAddress.on(myAddress)
-
-    return ()=>{
-      // subscribe.balancesByAddress.off(myAddress)
-      subscribe.bidsByAddress.off(myAddress)
-    }
-  },[myAddress])
-
-  useEffect(x=>{
-    Object.values(myBids).forEach(bid=>{
-      const id = [bid.name,bid.auctionId].join('!')
-      subscribe.auctions.on(id)
-    })
-
-    return ()=>{
-      Object.values(myBids).forEach(bid=>{
-        const id = [bid.name,bid.auctionId].join('!')
-        subscribe.auctions.off(id)
-      })
-    }
-  },[Object.values(myBids).length])
-
   if(registry==null) return <div>Loading</div>
 
 
-  const inactiveBids = Object.values(myBids).filter(x=>!x.isActive && x.amount != '0')
-  // console.log({myBids,inactiveBids,registry})
+  const inactiveBids = Object.values(myBids).filter(x=>!x.isActive && x.claim != '0')
 
   return <Box>
-    <ClaimModal show={show} onHide={handleClose} onClick={handleClose} bids={inactiveBids}/>
+    <ClaimModal 
+      show={show} 
+      onHide={handleClose} 
+      onClick={handleClose} 
+      bids={inactiveBids} 
+    />
     {
       inactiveBids.length ? 
       <Button variant='warning' size='sm' onClick={handleShow}>
@@ -137,6 +124,6 @@ export const ClaimModalButton = wiring.connect((props) =>{
       : null
     }
   </Box>
-})
+}
 
 

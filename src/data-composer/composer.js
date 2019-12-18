@@ -4,12 +4,12 @@ import Ethers from '../ethers'
 import RegistryABI from '../abis/registry'
 import AuctionABI from '../abis/auction'
 import Models from '../models'
-import {loop,BigNumber} from '../utils'
-import State from './state'
+import {loop,BigNumber,setRecursive} from '../utils'
+// import State from './state'
+import Store from 'react-wiring/store'
 
 export default async (config={},{provider},emit=x=>x) =>{
   assert(BigNumber,'requires bignumber')
-  const state = State({})
   //{
   //  registry:{
   //    tokens:{
@@ -20,6 +20,18 @@ export default async (config={},{provider},emit=x=>x) =>{
   //    }
   //  }
   //}
+
+  const store = Store({
+    set(state,path,data){
+      return setRecursive({...state},path,data)
+    }
+  })
+
+  const stop = store.on(data=> emit('registry',data.registry),[])
+
+  const set = store.curry('set')
+
+
   const models = Models(config.models,{BigNumber},(table,id,data)=>{
 
     let path = []
@@ -51,17 +63,20 @@ export default async (config={},{provider},emit=x=>x) =>{
       }
       case 'balances':{
         path = ['registry','tokens',data.name,'balances']
+        //hack in a balances index
+        // set(['registry','balances',data.address,data.id],data)
         break;
       }
       case 'bids':{
         //default to bid is active
-        const {isActive} = state.get(['registry','tokens',data.name,'auctions',data.auctionId],{isActive:true})
+        const {isActive} = store.get(['registry','tokens',data.name,'auctions',data.auctionId],{isActive:true})
 
         data = {...data,isActive}
 
         path = ['registry','tokens',data.name,'auctions',data.auctionId,'bids',data.address]
+        // console.log('bids',path,data)
         //hack in a bids index
-        state.set(['registry','bids',data.address,data.id],data)
+        set(['registry','bids',data.address,data.id],data)
         break;
       }
       default:
@@ -69,15 +84,24 @@ export default async (config={},{provider},emit=x=>x) =>{
         // console.log(table,id,data)
         // emit([table,id],data)
     }
+    //merge child data before we update store
     if(data){
-      const prev = state.get(path,{})
-      state.set(path,{...prev,...data})
+      const prev = store.get(path,{})
+      set(path,{...prev,...data})
     }else{
-      state.unset(path)
+      //delete data
+      set(path)
     }
-    // console.log(state.get())
-    emit('registry',state.get('registry'))
   })
+
+  function updateBids(auction){
+    const matches = models.bids.list().filter(bid=>{
+      return bid.auctionId == auction.auctionId && bid.name == auction.name && bid.isActive != auction.isActive
+    })
+    matches.forEach(bid=>{
+      return models.bids.update(bid.id,{isActive:auction.isActive})
+    })
+  }
 
   //provider is now optional so we can still read the site 
   let ethers
@@ -92,6 +116,7 @@ export default async (config={},{provider},emit=x=>x) =>{
       case 'balances':
         return models.balances.set(data)
       case 'registries':
+        // console.log(type,data)
         return models.registry.set(data)
       case 'auctionManagers':
         // if(models.auctionContracts.has(data.name)) return
@@ -103,17 +128,26 @@ export default async (config={},{provider},emit=x=>x) =>{
         }else{
           models.auctions.create(data)
         }
-        return models.auctions.tick(id)
+        const auction = models.auctions.tick(id)
+        updateBids(auction)
+        return
       }
       default:
         console.log('unhandled event',type,data)
     }
   })
 
-  subscribe.registries.on('0')
+  subscribe.registries()
+  subscribe.auctions()
+  subscribe.auctionManagers()
+  subscribe.bids()
+  subscribe.balances()
+
 
   loop(x=>{
-    return [...models.auctions.table.keys()].forEach(id=>models.auctions.tick(id,Date.now()))
+    return [...models.auctions.table.values()]
+      .filter(auction=>auction.isActive)
+      .forEach(({id})=>models.auctions.tick(id,Date.now()))
   },1000)
 
   async function bid(name,value,donate=false){
@@ -131,7 +165,7 @@ export default async (config={},{provider},emit=x=>x) =>{
     assert(donationPercent != null,'requires donation percent')
     const donate = new BigNumber(total).times(donationPercent)
     const auction = await ethers.auction(name)
-    console.log({donate:donate.toString(),auctionId,total,name})
+    // console.log({donate:donate.toString(),auctionId,total,name})
     return auction.claimAndDonate(auctionId,donate)
   }
 

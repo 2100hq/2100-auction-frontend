@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import wiring from './wiring'
+import {useWiring,store} from './wiring'
 import RegistryABI from './abis/registry'
 import AuctionABI from './abis/auction'
 import GraphProto from './graphproto/graphproto'
@@ -28,12 +28,12 @@ const contracts = {
 
 
 async function init(){
-  const set = wiring.dispatch('set')
+  const set = store.curry('set')
 
   const {ethereum,web3} = window
   if(ethereum){
     // window.web3 = new Web3(ethereum)
-    await ethereum.enable().catch(wiring.dispatch('setError'))
+    await ethereum.enable().catch(store.curry('setError'))
 
     web3.eth.getBalance(ethereum.selectedAddress,(err,balance)=>{
       // console.log({err,balance})
@@ -52,21 +52,28 @@ async function init(){
 
   //default donate settings
   const donate = Boolean(localStorage.getItem('donate'))
-  set('donate',donate)
 
   const throttleSet = throttle(set,1000,{leading:true})
 
   const {bid,claimAll,claim,create,subscribe,query,models} = await Composer({
-      graphql:{uri:process.env.REACT_APP_GRAPH_QUERY},
+      graphql:{
+        uri:process.env.REACT_APP_GRAPH_QUERY,
+        ws:process.env.REACT_APP_GRAPH_SOCKET
+      },
       ethers:contracts
     },
     {provider:ethereum,BigNumber},
+    // set,
     throttleSet
-    // set
+    // (path,data)=>{
+    //   console.log(path,data)
+    //   set(path,data)
+    // }
   )
 
   // console.log({bid,claim,create,subscribe,query,models})
   return {
+    donate,
     query,
     subscribe,
     bid,
@@ -83,10 +90,9 @@ async function init(){
 
 window.addEventListener('load', async ()=>{
   const state = await init().catch(console.log)
+  store.set(state)
   ReactDOM.render(
-    <wiring.Provider {...state}>
-      <App />
-    </wiring.Provider>
+    <App />
     ,
     document.getElementById('root')
   );

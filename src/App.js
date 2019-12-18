@@ -4,7 +4,8 @@ import {Form,FormControl, Button, Container,Alert, Toast, Navbar, Nav, NavDropdo
 import { useWeb3Context } from 'web3-react'
 import {ethers} from 'ethers'
 import {LatestAuction} from './components/auction'
-import wiring from './wiring'
+import {timeout} from './utils'
+import {useWiring} from './wiring'
 import RegistryPage from './pages/registry'
 import AuctionPage from './pages/auction'
 import AuctionHistoryPage from './pages/auctionhistory'
@@ -18,15 +19,25 @@ import {
 } from "react-router-dom";
 
 
-export default wiring.connect(props=> {
-  const {dispatch,error,success} = props
+export default props=> {
+  const [{error,success},dispatch] = useWiring(['error','success'])
+
+  useEffect(x=>{
+    if(error == null) return
+    return timeout(hideError,3000)
+  },[error])
+
+  useEffect(x=>{
+    if(success == null) return
+    return timeout(hideSuccess,3000)
+  },[success])
 
   function hideError(){
-    dispatch('setError')(null)
+    dispatch('setError',null)
   }
 
   function hideSuccess(){
-    dispatch('success')(null)
+    dispatch('success',null)
   }
  
   return (
@@ -58,7 +69,6 @@ export default wiring.connect(props=> {
         </Toast>
         <Navbar bg="light" expand="lg">
         <Navbar.Brand><Link to='/'>2100</Link></Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Form inline>
           <ClaimModalButton/>
         </Form>
@@ -82,5 +92,5 @@ export default wiring.connect(props=> {
     </Router>
   </div>
   );
-})
+}
 
