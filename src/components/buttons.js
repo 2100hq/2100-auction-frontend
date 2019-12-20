@@ -65,15 +65,38 @@ export const ClaimButton = ({name,auctionId,onClick=x=>x,onSubmit=x=>x})=>{
   </Button>
 }
 
-export const ClaimAllButton = ({name,auctionIds,amount='0',onClick=x=>x})=>{
-  const [{claimAll},,dispatch] = useWiring()
+export const ClaimAllAuctionButton = ({name,auctionIds,amount='0',onClick=x=>x})=>{
+  const [{claimAllAuction},,dispatch] = useWiring()
   function click(){
-    return claimAll(name,auctionIds)
+    return claimAllAuction(name,auctionIds)
       .then(x=>dispatch('success')('Claiming Auction'))
       .catch(dispatch('setError'))
       .finally(onClick)
   }
   return <Button onClick={click}>
     Withdraw
+  </Button>
+}
+
+export const ClaimAllButton = ({bids=[],onClick=x=>x})=>{
+  const [{claimAll},,dispatch] = useWiring()
+
+  const {addresses,auctionIds} = bids.reduce((result,bid)=>{
+    if(bid.claim == '0') return result
+    result.addresses.push(bid.tokenAddress)
+    result.auctionIds.push(bid.auctionId)
+    return result
+  },{addresses:[],auctionIds:[]})
+
+  console.log({addresses,auctionIds})
+
+  function click(){
+    return claimAll(addresses,auctionIds)
+      .then(x=>dispatch('success')('Claiming All Tokens'))
+      .catch(dispatch('setError'))
+      .finally(onClick)
+  }
+  return <Button onClick={click}>
+    Withdraw All
   </Button>
 }

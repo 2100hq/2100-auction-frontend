@@ -12,6 +12,7 @@ export default (config={},libs={},emit=x=>x) =>{
     auctions: new Map(),
     registry: new Map(),
     auctionContracts: new Map(),
+    stats: new Map(),
   }
 
   const handleEvent = table => (id,data)=>{
@@ -24,6 +25,7 @@ export default (config={},libs={},emit=x=>x) =>{
     auctions: Auctions(config.auctions,{...libs,table:tables.auctions},handleEvent('auctions')),
     registry: Registry(config.registry,{...libs,table:tables.registry},handleEvent('registry')),
     auctionContracts: AuctionContracts(config.auctionContracts,{...libs,table:tables.auctionContracts},handleEvent('auctionContracts')),
+    stats: AuctionContracts(config.stats,{...libs,table:tables.stats},handleEvent('stats')),
   }
 
   return models

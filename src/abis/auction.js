@@ -1,12 +1,17 @@
 export default [
     {
       "constant": true,
-      "inputs": [],
-      "name": "name",
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "balances",
       "outputs": [
         {
           "name": "",
-          "type": "string"
+          "type": "uint256"
         }
       ],
       "payable": false,
@@ -80,6 +85,66 @@ export default [
     },
     {
       "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "auctions",
+      "outputs": [
+        {
+          "name": "startTime",
+          "type": "uint64"
+        },
+        {
+          "name": "deposits",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        },
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "allowed",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
       "inputs": [],
       "name": "owner",
       "outputs": [
@@ -135,17 +200,6 @@ export default [
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "name": "_base",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
       "anonymous": false,
       "inputs": [
         {
@@ -193,7 +247,7 @@ export default [
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "name": "auctionId",
           "type": "uint256"
         },
@@ -215,7 +269,7 @@ export default [
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "name": "auctionId",
           "type": "uint256"
         },
@@ -230,26 +284,26 @@ export default [
           "type": "uint256"
         }
       ],
-      "name": "Start",
+      "name": "StartAuction",
       "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "name": "auctionId",
           "type": "uint256"
         }
       ],
-      "name": "Finalize",
+      "name": "EndAuction",
       "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "name": "auctionId",
           "type": "uint256"
         },
@@ -272,8 +326,8 @@ export default [
       "inputs": [
         {
           "indexed": true,
-          "name": "_to",
-          "type": "address"
+          "name": "auctionId",
+          "type": "uint256"
         },
         {
           "indexed": false,
@@ -289,8 +343,8 @@ export default [
       "inputs": [
         {
           "indexed": true,
-          "name": "_to",
-          "type": "address"
+          "name": "auctionId",
+          "type": "uint256"
         },
         {
           "indexed": false,
@@ -346,6 +400,20 @@ export default [
       ],
       "name": "NoteInt",
       "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_base",
+          "type": "string"
+        }
+      ],
+      "name": "init",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "constant": true,
@@ -407,7 +475,7 @@ export default [
     {
       "constant": false,
       "inputs": [],
-      "name": "startNextAuction",
+      "name": "startAuction",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -443,10 +511,6 @@ export default [
         },
         {
           "name": "isActive",
-          "type": "bool"
-        },
-        {
-          "name": "isStopReached",
           "type": "bool"
         },
         {
@@ -570,6 +634,57 @@ export default [
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_auctionId",
+          "type": "uint256"
+        },
+        {
+          "name": "_for",
+          "type": "address"
+        }
+      ],
+      "name": "claimTokensFor",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "payload",
+          "type": "bytes"
+        }
+      ],
+      "name": "claimDonations",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
       "type": "function"
     },
     {

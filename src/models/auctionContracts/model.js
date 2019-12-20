@@ -9,7 +9,7 @@ export default (config, {table,BigNumber}, emit=x=>x)=>{
 
   function set(auction){
     assert(auction.id,'requires auction id')
-    auction = parse(auction)
+    auction = parse(defaults(auction))
     table.set(auction.id,auction)
     emit(auction.id,auction)
     return auction
@@ -33,6 +33,16 @@ export default (config, {table,BigNumber}, emit=x=>x)=>{
     return table.has(id)
   }
 
+  function defaults(props){
+    return {
+      name:'',
+      currentAuctionId:0,
+      amount:0,
+      duration:0,
+      maximumSupply:0,
+      ...props,
+    }
+  }
   function parse(props){
     return {
       ...props,

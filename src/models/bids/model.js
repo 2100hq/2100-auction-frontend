@@ -9,6 +9,7 @@ export default (config, {table}, emit=x=>x)=>{
       address:props.address.toString(),
       auctionId:props.auctionId.toString(),
       name:props.name.toString(),
+      tokenAddress:props.tokenAddress.toString(),
       amount:props.amount.toString(),
     }
   }

@@ -18,7 +18,7 @@ const contracts = {
   registry:{
     // address:'0x8fBC76f664ccF77D93D2e4F25D37a995379774B7',
     // address:'0x48fd2fc9a774359d2f64a710e1deb1387cedbaea',
-    address:'0xa623Ddf7b1D79baADE582F9a4558a430E6fe9395',
+    address:'0xc7a933665971c59857744ee89418e552807cf4c3',
     abi:RegistryABI
   },
   auction:{
@@ -55,7 +55,7 @@ async function init(){
 
   const throttleSet = throttle(set,1000,{leading:true})
 
-  const {bid,claimAll,claim,create,subscribe,query,models} = await Composer({
+  const {bid,claimAll,claim,create,claimAllAuction,subscribe,query,models} = await Composer({
       graphql:{
         uri:process.env.REACT_APP_GRAPH_QUERY,
         ws:process.env.REACT_APP_GRAPH_SOCKET
@@ -79,6 +79,7 @@ async function init(){
     bid,
     claim,
     claimAll,
+    claimAllAuction,
     create,
     models,
     BigNumber,

@@ -36,6 +36,10 @@ export default async (config={},{provider},emit=x=>x) =>{
 
     let path = []
     switch(table){
+      case 'stats':{
+        set(['registry','stats',data.id],data.amount)
+        break;
+      }
       case 'auctions':{
         //an auction finished, we should increment the manager
         //if(!data.isActive && data.deposits != '0'){
@@ -111,6 +115,8 @@ export default async (config={},{provider},emit=x=>x) =>{
 
   const {query,subscribe} = await GraphProto(config.graphql,{},(type,data)=>{
     switch(type){
+      case 'stats':
+        return models.stats.set(data)
       case 'bids':
         return models.bids.set(data)
       case 'balances':
@@ -142,7 +148,7 @@ export default async (config={},{provider},emit=x=>x) =>{
   subscribe.auctionManagers()
   subscribe.bids()
   subscribe.balances()
-
+  subscribe.stats()
 
   loop(x=>{
     return [...models.auctions.table.values()]
@@ -169,11 +175,18 @@ export default async (config={},{provider},emit=x=>x) =>{
     return auction.claimAndDonate(auctionId,donate)
   }
 
-  async function claimAll(name,auctionids=[]){
+  async function claimAllAuction(name,auctionids=[]){
     assert(ethers,'Please connect metamask')
     assert(name,'requires auction name')
     const auction = await ethers.auction(name)
     return auction.claimAll(auctionids)
+  }
+  
+  async function claimAll(addresses=[],auctionids=[]){
+    assert(ethers,'Please connect metamask')
+    assert(addresses.length,'requires auction addresses')
+    assert(auctionids.length,'requires auction auctionids')
+    return ethers.claimTokens(addresses,auctionids)
   }
 
   async function claim(name,auctionid){
@@ -189,6 +202,7 @@ export default async (config={},{provider},emit=x=>x) =>{
     //claim auction token
     claimAndDonate,
     claimAll,
+    claimAllAuction,
     claim,
     //create new token name
     create:async (...args)=>{

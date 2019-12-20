@@ -1,7 +1,6 @@
 import React from 'react';
 import lodash from 'lodash'
 import Wiring from 'react-wiring'
-import {set,unset} from '@daywiss/utils/set'
 
 const defaultState = {}
 
@@ -15,7 +14,6 @@ const reducers = {
     }
   },
   setDonate(state,donate){
-    console.log('wiring',{donate})
     if(donate){
       localStorage.setItem('donate','1')
     }else{

@@ -1,7 +1,6 @@
 import assert from 'assert'
 import bigjs from 'big.js'
 import lodash from 'lodash'
-// import daywiss from '@daywiss/utils/set'
 export async function loop(fn,delay,...args){
   await fn(...args)
   await new Promise(res=>setTimeout(res,delay))
@@ -91,13 +90,5 @@ export function setRecursive(state={},path=[],data){
   state[head] = setRecursive({...state[head]},rest,data)
   return state
 }
-// export function set(state,path=[],data){
-//   return daywiss.set(state,path,data,Object)
-// }
-
-// export function get(state,path=[],fallback){
-//   if(path.length == 0) return state || fallback
-//   return daywiss.get(state,path,fallback)
-// }
 
 

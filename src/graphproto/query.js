@@ -67,7 +67,7 @@ export default async (config,{apollo,gql}) => {
   function getBidById(id){
     return query(`{
       bid(id:"${id}"){
-        id address auctionId name amount claim
+        id address auctionId name amount claim tokenAddress
       }
     }`,'bid')
   }
@@ -151,7 +151,7 @@ export default async (config,{apollo,gql}) => {
     assert(address,'requires address')
     return query(`{
       bids(where:{amount_gte:0 address:"${address}"}){
-        id amount name address auctionId claim
+        id amount name address auctionId claim tokenAddress
       }
     }`,'bids')
   }

@@ -13,7 +13,12 @@ export default (config={},libs) => {
 
   function create(name){
     assert(name,'requires auction name')
-    return contract.create(name)//,{gasLimit:'0x' + new BigNumber('6721975').toString(16)})
+    return contract.createToken(name)//,{gasLimit:'0x' + new BigNumber('6721975').toString(16)})
+  }
+  function claimTokens(addresses,auctionids){
+    return contract.claimTokens(addresses,auctionids,{
+      gasLimit: 1750000
+    })
   }
   function destroyString(name){
     assert(name,'requires auction name')
@@ -27,6 +32,7 @@ export default (config={},libs) => {
   return {
     create,
     destroyString,
+    claimTokens,
     stringToAddress,
   }
 

@@ -75,11 +75,23 @@ export default async (config,{apollo,gql},emit=x=>x) => {
     }) 
   }
 
+  function stats(){
+    return subscribe(`
+      {
+        stats{
+        id amount 
+      }
+    }
+    `,'stats',(data=[])=>{
+      data.forEach(data=>emit('stats',data))
+    })                   
+  }
+
   function bids(){
     return subscribe(`
       {
         bids{
-        id amount name address auctionId claim
+        id amount name address auctionId claim tokenAddress
       }
     }
     `,'bids',(data=[])=>{
@@ -93,6 +105,7 @@ export default async (config,{apollo,gql},emit=x=>x) => {
     bids,
     balances,
     auctions,
+    stats,
   }
   //assert(query,'requires query')
   //assert(loop,'requires loop')

@@ -3,7 +3,7 @@ import {Link,useParams} from 'react-router-dom'
 import {useWiring} from '../wiring'
 import humanize from 'humanize-duration'
 import {humanizeWei,toEth,toWei,BigNumber,get} from '../utils'
-import {ClaimAllButton} from './buttons'
+import {ClaimAllAuctionButton, ClaimAllButton} from './buttons'
 import {Modal,Button} from 'react-bootstrap'
 import {Flex,Box} from '../styles'
 
@@ -20,7 +20,7 @@ export const BidRow = (props)=>{
     <Flex width={256} marginLeft={20} justifyContent='flex-start'>
       <h5>{toEth(amount)} ETH</h5>
     </Flex>
-    <ClaimAllButton name={name} auctionIds={auctionIds} amount={amount}/>
+    <ClaimAllAuctionButton name={name} auctionIds={auctionIds} amount={amount}/>
   </Flex>
 }
 
@@ -85,6 +85,8 @@ export const ClaimModal = (props={}) =>{
     </Modal.Body>
 
     <Modal.Footer>
+
+      <ClaimAllButton variant="primary" bids={bids} onClick={onClick}/>
       <Button variant="secondary" onClick={onClick}>Close</Button>
     </Modal.Footer>
   </Modal>

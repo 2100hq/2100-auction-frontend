@@ -32,23 +32,6 @@ export default (props)=>{
     query.getDoneAuctionsByName(name).then(setHistory).catch(dispatch('setError'))
   },[name])
 
-  ////once our auction manager exists subscribe to the particular auction
-  //useEffect(x=>{
-  //  if(!token) return
-
-  //  const id = `${name}!${token.currentAuctionId}`
-  //  subscribe.auctions.on(id)
-
-  //  const bidid = `${myAddress}!${name}!${token.currentAuctionId}`
-  //  subscribe.bids.on(bidid)
-
-  //  return ()=>{
-  //    subscribe.auctions.off(id)
-  //    subscribe.bids.off(bidid)
-  //  }
-  //},[token ? token.id : null])
-
-
   if(!registry || !registry.strings) return <p> Loading </p>
   if(!token) return <p> Loading </p>
 
@@ -58,9 +41,6 @@ export default (props)=>{
   if(!auction || !auction.id) return <p> Loading </p>
 
   let auctionNumber = parseInt(auction.auctionId)
-  // if(auction.done){
-  //   auctionNumber++
-  // }
 
   return <div>
     <Modal
@@ -103,6 +83,10 @@ export default (props)=>{
             <Flex justifyContent='space-around'>
               <AuctionChart newBid={bid} auction={auction} auctionManager={token} myAddress={myAddress}/>
               <Flex flexDirection='column' justifyContent='space-around' alignItems='center'>
+                {auction.done ? <Flex maxWidth={300}>
+                  <strong>This auction has completed. Your bid will automatically start the next one.</strong>
+                </Flex>:null
+                }
                 <Flex flexWrap='wrap' justifyContent='center' alignItems='flex-end'>
                   <Flex flexDirection='column' justifyContent='center'>
                     { 
