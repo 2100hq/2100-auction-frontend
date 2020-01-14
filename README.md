@@ -5,6 +5,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 Add a .env file with the following variables.
 ```
 REACT_APP_GRAPH_QUERY=
+REACT_APP_GRAPH_SOCKET=
 ```
 
 ## Available Scripts
